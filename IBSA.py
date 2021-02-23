@@ -6,6 +6,7 @@ from mutmap_page import MutmapPage
 from BSR_page import BSRPage
 from Qtlseq_page import QtlPqge
 from fisher_page import fisher_page
+from Gps_page import GpsPage
 import pandas as pd
 import numpy as np
 import re
@@ -35,7 +36,9 @@ class FirstPage(QWidget):
         self.circle_button.clicked.connect(self.open_circus_page)
         self.fisher_button = QPushButton('fisher')
         self.fisher_button.clicked.connect(self.open_fisher_page)
-        
+        self.GPS_button = QPushButton('GPS')
+        self.GPS_button.clicked.connect(self.open_GPS_page)
+
         self.ways_layout = QGridLayout()
         self.upload_layout = QVBoxLayout()
         self.all_layout = QVBoxLayout()
@@ -48,6 +51,7 @@ class FirstPage(QWidget):
         self.ways_layout.addWidget(self.qtl_button, 1, 0)
         self.ways_layout.addWidget(self.circle_button, 1, 1)
         self.ways_layout.addWidget(self.fisher_button, 2, 0)
+        self.ways_layout.addWidget(self.GPS_button, 2, 1)
 
         self.all_layout.addLayout(self.upload_layout)
         self.all_layout.addLayout(self.ways_layout)
@@ -98,6 +102,10 @@ class FirstPage(QWidget):
     def open_fisher_page(self):
         self.fisher_page = fisher_page(self.usr_df,self.usr_df_index)
         self.fisher_page.show()
+        self.close()
+    def open_GPS_page(self):
+        self.GPS_page = GpsPage(self.usr_df,self.usr_df_index)
+        self.GPS_page.show()
         self.close()
 
 if __name__ == "__main__":
