@@ -157,7 +157,7 @@ class fisher_page(QTabWidget):
         df['bulk1_alt'] = df['pool_1_ad'].str.split(',').str[1]
         df['bulk2_ref'] = df['pool_2_ad'].str.split(',').str[0]
         df['bulk2_alt'] = df['pool_2_ad'].str.split(',').str[1]
-        df[['k','pvalue']]= df.apply(lambda x:stats.fisher_exact([[x.bulk1_alt,x.bulk1_ref],[x.bulk2_alt,x.bulk2_ref]], alternative='two-sided'),axis = 1,result_type="expand")
+        df[['k','pvalue']]= df.apply(lambda x:stats.fisher_exact([[x.bulk1_alt,x.bulk1_ref],[x.bulk2_alt,x.bulk2_ref]], alternative='greater'),axis = 1,result_type="expand")
         df['d']=df.apply(lambda x:-math.log(x.pvalue,10),axis = 1)
         df['POS']=df['POS'].astype('str').astype('int')
         self.df = df[['CHROM', 'POS', 'REF', 'ALT','pool_1_gt','pool_2_gt','k','pvalue','d']]
@@ -196,7 +196,7 @@ class fisher_page(QTabWidget):
         for i in range(0,self.chrom_count):
             draw_df_1 = self.df_window[self.df_window['chrom'] == self.chroms[i]]
             draw_df_2 = self.df[self.df['CHROM'] == self.chroms[i]]
-            ax = self.fig.add_subplot(2,pic_row,i+1)
+            ax = self.fig.add_subplot(2,5,i+1)
             ax.cla()
             ax.plot(draw_df_1['window_central']/1000000,draw_df_1['slide_pvalue'],c='red',linewidth=3)
             ax.axhline(y=-math.log(0.01,10), c="g", ls="--")
