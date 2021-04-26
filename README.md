@@ -1,30 +1,18 @@
 # IBSA
-software for BSA-seq based on PyQt
-IBSA数据分析软件
-IBSA是一个用于BSA(集团分离法)测序数据分析的软件。用户使用该软件能够对前期获得的VCF文件进行后续的分析和绘图工作。该软件提供了mutmap、qtl-seq、bsr，fisher_exact等分析流程，还提供了一个基因组圈图的绘图功能，用户只需要安装就可以工作，并且可以设置参数，可以下载到所需的图片及表格。
-3主要参数及通用功能说明
-3.1主要参数说明
-在用户上传文件之后，IBSA会自动获取有效的列名。根据提示选择即可
-Min_depth为最小测序深度，默认为5，用户也可以自己输入，max_depth为最大测序深度，默认为300，用户也可以自己输入，min_snpindex代表最小snpindex值，默认为300，用户也可以通过调节按钮改变这些参数的设置。
-第一个next按钮表示按照第一个区域的参数对数据进行过滤。
-Window_size代表滑动窗口的大小，默认为2000bp，window_step代表滑窗的步长，当window_step被设置为0时，就是无重叠滑窗。N_snp_in_window参数代表滑动窗口内最少有多少个snp位点。
-3.2下载
- 点击相应的download按钮就可以下载文件，文件类型已经设置好。 
-3.3输出文件的内容说明
-IBSA输出文件主要有两种，其中一种为图片，另外一种为文本文件。
-图片文件示例，图片标题为染色体名称，x轴为染色体位置，y轴为相应的指标数值。
-Variant文件示例，会输出染色体名称，ref和alt，以及对应指标的值。 
-Windows文件示例，输出染色体名称和窗口末端位置，窗口起始位置，窗口中央位置，以及对应指标的滑动平均值。
-点击上传文件按钮，在弹出的文件选择框里，选择相应的文件即可。下方的文本框中会显示文件的表头及第一行的内容，出现该内容就表示文件已经上传完毕，可以根据需要选择相应的分析流程。
-IBSA会展示vcf文件的第一行有效内容，用以确认上传信息的准确性。
-首先需要选择亲本（parent）和子代（pool）的名称，然后选择最低深度和最大深度，和最小的snpindex阈值，然后点击上方的next按钮完成相应的过滤步骤，然后选择滑窗的相应参数，包括窗口大下，滑窗步长和窗内需要的最小snp数量，如果数量低于该阈值，该窗口将会被丢弃。点击下方的next按钮就会进行滑窗步骤。点击上方的snp_index按钮就会出现相应的界面。如果对参数设置的不满意，可以再次选择参数然后点击next按钮即可。
-点击draw按钮就可以完成绘图操作，通过点击相应的下载按钮，可以下载图片，滑窗文件，变异位点文件。
-用户需要选择两个子代池的名称以及过滤参数，过滤参数的设置与之前相同，先进行过滤之后，再选择滑窗参数进行滑窗。
-Bsr的信息选择和之前相同，这里的指标计算是以参考基因组为亲本，不需要用户提供亲本的信息。根据ed值进行绘图，点击相应的按钮可以完成绘图和下载功能。
-用户需要选择和输入相应的信息，这里用户可以选择输入一个或两个列作为亲本，默认为一个亲本，按钮功能与之前一致，pool1，pool2页面显示的为相应子代的snp_index折线图，delta_snpindex和ed6页面显示相应指标的计算情况，可以在pool1页面下载文件，图片在相应的页面下载。
-circus的使用
-上传文件，点击draw即可。
-点击download即可下载。会绘制出一个染色体圈图，顺时针起代表相应的染色体，其中第一圈代表染色长度，第二圈和第三圈分别代表snp和indel
-信息，高度为100kb内变异的数量。
+## introduction
+An Integrated GUI software for BSA-seq based on PyQt
+Users can use the software to analyze and draw the VCF file. The software provides MutMap, QTL-Seq,Modified Mutmap, Grade Pool-seq,Fihser-seq.It also provides a mapping function of genome circle map. Users only need to install it to work, set parameters, and download the required pictures and tables.
+## installtion
+### Dependencies
+- sys
+- PyQt5
+- pandas
+- numpy
+- re
+- matplotlib
+- scipy
+- math
+1.download package
+2.down code
+ ```python IBSA.py```
 
- 
