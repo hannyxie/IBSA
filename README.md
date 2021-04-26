@@ -28,15 +28,15 @@ Modified Mutmap|2bulk|delta SNP-index,ED6|p99
 Fisher|2 bulk|-log10(p) (Fisher's exact test)|3
 Graded Pool-seq|0-2 parent,>1 bulk|-log10(p) (Ridit)|the highest p window
 
-#### 1.uplod file and choose method
+### 1.uplod file and choose method
 <img src= "https://user-images.githubusercontent.com/51356059/116029007-f0c3e600-a68a-11eb-88ae-39cd58ddab59.png" width=400 height=320 />
-#### 2.setting 
+### 2.setting 
 setting sample names,if you use Grade-Pool seq,please input bulk name,split by comma.firstly,click first 'NEXT' button,caculate index based on samples.
 Then setting slide window paremters and click second 'NEXT' button to smooth the index.
 <img src= "https://user-images.githubusercontent.com/51356059/116029818-b78c7580-a68c-11eb-8f82-badd1f328f71.png" width=400 height=320 />
-#### 3.plotting
+### 3.plotting
 Tab to another page then click 'plotting' button.the picture will show.
-#### 4.downlod
+### 4.downlod
 Click the corresponding button to download the file.
 
 
