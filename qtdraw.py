@@ -19,8 +19,8 @@ class QtDraw(QWidget):
         self.setWindowTitle('circus')
         self.tools_layout = QHBoxLayout()
 
-        self.btn_start = QPushButton('draw')
-        self.down_botton = QPushButton('download')
+        self.btn_start = QPushButton('Plot')
+        self.down_botton = QPushButton('Download')
 
         self.tools_layout.addWidget(self.btn_start)
         self.tools_layout.addWidget(self.down_botton)

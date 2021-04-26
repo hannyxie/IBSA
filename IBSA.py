@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from mutmap_page import MutmapPage
-from BSR_page import BSRPage
+from MM_page import MMPage
 from Qtlseq_page import QtlPqge
 from fisher_page import fisher_page
 from Gps_page import GpsPage
@@ -20,26 +20,27 @@ class FirstPage(QWidget):
 
     def __init__(self):
         super(FirstPage,self).__init__()
-        self.setWindowTitle('IBSA')
-        self.welcome_label= QLabel('欢迎使用IBSA')
+        self.setWindowTitle('IBSA V1.0.2')
+        self.welcome_label= QLabel('Welcome to use IBSA!'+'\n'+'Feel free to conact us!')
 
-        self.upload_button = QPushButton('上传文件')
+        self.upload_button = QPushButton('Upload')
         self.upload_button.clicked.connect(self.uploausr_dfile)
         self.contents = QTextBrowser()
-        self.mutmap_button = QPushButton('mutmap')
+        self.mutmap_button = QPushButton('Mutmap')
         self.mutmap_button.clicked.connect(self.open_mutmap_page)
-        self.qtl_button = QPushButton('qtl-seq')
+        self.qtl_button = QPushButton('QTL-seq')
         self.qtl_button.clicked.connect(self.open_qtl_page)
-        self.bsr_button = QPushButton('bsr')
-        self.bsr_button.clicked.connect(self.open_bsr_page)
-        self.circle_button = QPushButton('circus')
+        self.mm_button = QPushButton('Modified MutMap')
+        self.mm_button.clicked.connect(self.open_mm_page)
+        self.circle_button = QPushButton('Circus')
         self.circle_button.clicked.connect(self.open_circus_page)
-        self.fisher_button = QPushButton('fisher')
+        self.fisher_button = QPushButton('Fisher')
         self.fisher_button.clicked.connect(self.open_fisher_page)
-        self.GPS_button = QPushButton('GPS')
+        self.GPS_button = QPushButton('GradedPool-Seq')
         self.GPS_button.clicked.connect(self.open_GPS_page)
 
         self.ways_layout = QGridLayout()
+        
         self.upload_layout = QVBoxLayout()
         self.all_layout = QVBoxLayout()
         self.upload_layout.addWidget(self.welcome_label)
@@ -47,7 +48,7 @@ class FirstPage(QWidget):
         self.upload_layout.addWidget(self.upload_button)
         self.upload_layout.addWidget(self.contents)
         self.ways_layout.addWidget(self.mutmap_button, 0, 0)
-        self.ways_layout.addWidget(self.bsr_button, 0, 1)
+        self.ways_layout.addWidget(self.mm_button, 0, 1)
         self.ways_layout.addWidget(self.qtl_button, 1, 0)
         self.ways_layout.addWidget(self.circle_button, 1, 1)
         self.ways_layout.addWidget(self.fisher_button, 2, 0)
@@ -84,29 +85,28 @@ class FirstPage(QWidget):
     
                   
     def open_mutmap_page(self):
-        self.mutmap_page = MutmapPage(self.usr_df,self.usr_df_index,self.mode)
+        self.mutmap_page = MutmapPage(self.usr_df,self.usr_df_index)
         self.mutmap_page.show()
-        self.close()
+        
     def open_qtl_page(self):
         self.qtl_page = QtlPqge(self.usr_df,self.usr_df_index)
         self.qtl_page.show()
-        self.close()
-    def open_bsr_page(self):
-        self.bsr_page = BSRPage(self.usr_df,self.usr_df_index)
-        self.bsr_page.show()
-        self.close()
+        
+    def open_mm_page(self):
+        self.mm_page = MMPage(self.usr_df,self.usr_df_index)
+        self.mm_page.show()
+
     def open_circus_page(self):
         self.circus_page = QtDraw(self.usr_df)
         self.circus_page.show()
-        self.close()
+        
     def open_fisher_page(self):
         self.fisher_page = fisher_page(self.usr_df,self.usr_df_index)
         self.fisher_page.show()
-        self.close()
+        
     def open_GPS_page(self):
         self.GPS_page = GpsPage(self.usr_df,self.usr_df_index)
         self.GPS_page.show()
-        self.close()
 
 if __name__ == "__main__":
     app = QApplication(sys.argv) 

@@ -7,43 +7,45 @@ from PyQt5.QtWidgets import QApplication, QPushButton, QMainWindow, QVBoxLayout,
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
-from scipy import stats
-import scipy.special.cython_special
-import math
 
 
-class fisher_page(QTabWidget):
-    def __init__(self,fisher_df,fisher_df_index):
-        super(fisher_page,self).__init__()
+
+class MMPage(QTabWidget):
+    def __init__(self,mm_df,mm_df_index):
+        super(MMPage,self).__init__()
         self.resize(800,550)
-        self.setWindowTitle('Fisher')
-        plt.style.use('ggplot')
-        self.fig = plt.Figure()
-        self.canvas = FC(self.fig)
+        self.setWindowTitle('Modified MutMap')
+        self.fig_1 = plt.Figure()
+        self.fig_2 = plt.Figure()
+        self.canvas_1 = FC(self.fig_1)
+        self.canvas_2 = FC(self.fig_2)
         self.tab1=QWidget()
         self.tab2=QWidget()
-        self.fisher_df = fisher_df
-        self.fisher_df_index = fisher_df_index
+        self.tab3=QWidget()
+        self.mm_df = mm_df
+        self.mm_df_index = mm_df_index
         self.addTab(self.tab1, 'Setting')
-        self.addTab(self.tab2, 'Fisher_exact')
+        self.addTab(self.tab2, 'delta_SNPindex')
+        self.addTab(self.tab3, 'ED6')
         self.tab1UI()
         self.tab2UI()
+        self.tab3UI()
 
 
     def tab1UI(self):
         pool_1_label = QLabel('Bulk1')
         self.pool_1_combox = QComboBox()
-        self.pool_1_combox.addItems(self.fisher_df_index)
+        self.pool_1_combox.addItems(self.mm_df_index)
         self.pool_1_combox.currentIndexChanged.connect(self.selectpool_1)
 
         pool_2_label = QLabel('Bulk2')
         self.pool_2_combox = QComboBox()
-        self.pool_2_combox.addItems(self.fisher_df_index)
+        self.pool_2_combox.addItems(self.mm_df_index)
         self.pool_2_combox.currentIndexChanged.connect(self.selectpool_2)
 
-        next_step_button_1 = QPushButton('next')
+        next_step_button_1 = QPushButton('Next')
         next_step_button_1.clicked.connect(self.clean_df)
-        next_step_button_2 = QPushButton('next')
+        next_step_button_2 = QPushButton('Next')
         next_step_button_2.clicked.connect(self.slide_window)
 
         min_depth_label = QLabel('Min_depth')
@@ -56,6 +58,11 @@ class fisher_page(QTabWidget):
         self.max_depth_spinbox.setMinimum(200)
         self.max_depth_spinbox.setMaximum(500)
         self.max_depth_spinbox.setValue(300)
+        min_snpindex_label = QLabel('Min_snpindex')
+        self.min_snpindex_spinbox = QDoubleSpinBox()
+        self.min_snpindex_spinbox.setMinimum(0.0)
+        self.min_snpindex_spinbox.setMaximum(0.5)
+        self.min_snpindex_spinbox.setValue(0.3)
         win_size_label = QLabel('Window_size')
         self.win_size_spinbox = QSpinBox()
         self.win_size_spinbox.setMinimum(0)
@@ -80,6 +87,8 @@ class fisher_page(QTabWidget):
         layout.addWidget(self.min_depth_spinbox,2,1)
         layout.addWidget(max_depth_label,3,0)
         layout.addWidget(self.max_depth_spinbox,3,1)
+        layout.addWidget(min_snpindex_label,4,0)
+        layout.addWidget(self.min_snpindex_spinbox,4,1)
         layout.addWidget(next_step_button_1, 5, 1)
         layout.addWidget(win_size_label,6,0)
         layout.addWidget(self.win_size_spinbox,6,1)
@@ -106,15 +115,23 @@ class fisher_page(QTabWidget):
 
    
         draw_layout  = QVBoxLayout()
-        draw_layout.addWidget(self.canvas)
+        draw_layout.addWidget(self.canvas_1)
 
         layout = QVBoxLayout()
         layout.addLayout(draw_layout)
         layout.addLayout(tools_layout)
         self.tab2.setLayout(layout)
-        down_botton_1.clicked.connect(self.download_picture)  
+        down_botton_1.clicked.connect(self.download_picture_1)  
         down_botton_2.clicked.connect(self.download_window)
-        down_botton_3.clicked.connect(self.download_variant)   
+        down_botton_3.clicked.connect(self.download_variant) 
+    
+    def tab3UI(self):
+        layout = QVBoxLayout()
+        down_botton_4 = QPushButton('Download_picture')
+        down_botton_4.clicked.connect(self.download_picture_2)  
+        layout.addWidget(self.canvas_2)
+        layout.addWidget(down_botton_4)
+        self.tab3.setLayout(layout)
 
     def selectpool_2(self):
         self.pool_2_index = self.pool_2_combox.currentIndex()
@@ -124,14 +141,16 @@ class fisher_page(QTabWidget):
     
     
     def clean_df(self):
-        df = self.fisher_df
+        df = self.mm_df
         min_depth = self.min_depth_spinbox.value()
         max_depth = self.max_depth_spinbox.value()
+        min_snpindex =self.min_snpindex_spinbox.value()
         filed_index=[]
         filed = df.loc[0,'FORMAT'].split(':')
         filed_index.append(filed.index('GT'))
         filed_index.append(filed.index('AD'))
-        filed_index.append(filed.index('DP'))
+        if 'DP' in filed:
+            filed_index.append(filed.index('DP'))
         pool_1 = df.iloc[:,self.pool_1_index].str.split(':', expand=True).iloc[:,filed_index]
         pool_1.columns = ['pool_1_gt', 'pool_1_ad','pool_1_dp']
         pool_2 = df.iloc[:,self.pool_2_index].str.split(':', expand=True).iloc[:, filed_index]
@@ -150,16 +169,53 @@ class fisher_page(QTabWidget):
         df = df[df['pool_2_dp']>min_depth]
         df = df[df['pool_2_dp']<max_depth]
         df.dropna(inplace=True)
+
+
         self.chroms = df['CHROM'].unique()
         self.chrom_count =len(self.chroms)
-        df['bulk1_ref'] = df['pool_1_ad'].str.split(',').str[0]
-        df['bulk1_alt'] = df['pool_1_ad'].str.split(',').str[1]
-        df['bulk2_ref'] = df['pool_2_ad'].str.split(',').str[0]
-        df['bulk2_alt'] = df['pool_2_ad'].str.split(',').str[1]
-        df[['k','pvalue']]= df.apply(lambda x:stats.fisher_exact([[x.bulk1_alt,x.bulk1_ref],[x.bulk2_alt,x.bulk2_ref]], alternative='two-sided'),axis = 1,result_type="expand")
-        df['d']=df.apply(lambda x:-math.log(x.pvalue,10),axis = 1)
-        df['POS']=df['POS'].astype('str').astype('int')
-        self.df = df[['CHROM', 'POS', 'REF', 'ALT','pool_1_gt','pool_2_gt','k','pvalue','d']]
+        def get_snp_index(pool_gt,pool_ad,parent_gt = ''):
+            snp_index = None
+            if parent_gt:
+                if parent_gt == '0/0':
+                    if pool_gt == '1/1':
+                        snp_index = 1
+                    elif pool_gt == '0/1':
+                        snp_index = int(pool_ad.split(',')[1])/(int(pool_ad.split(',')[1])+int(pool_ad.split(',')[0]))
+                    elif pool_gt == '0/0':
+                        snp_index = 0
+                elif parent_gt == '1/1':
+                    if pool_gt == '0/0':
+                        snp_index = 1
+                    elif pool_gt == '0/1':
+                        snp_index = int(pool_ad.split(',')[0])/(int(pool_ad.split(',')[1])+int(pool_ad.split(',')[0]))
+                    elif pool_gt == '1/1':
+                        snp_index = 0
+                else:
+                    snp_index = None
+            else:
+                if pool_gt == '1/1':
+                    snp_index = 1
+                elif pool_gt == '0/1':
+                    if (int(pool_ad.split(',')[1])+int(pool_ad.split(',')[0])) > 0:
+                        snp_index = int(pool_ad.split(',')[1])/(int(pool_ad.split(',')[1])+int(pool_ad.split(',')[0]))
+                elif pool_gt == '0/0':
+                    snp_index = 0
+                else:
+                    snp_index = None
+            return snp_index
+        
+        def get_ed6(index1,index2):
+            ed6 = ((2*(index2 - index1)**2)**(0.5))**6
+            return ed6
+
+        df['pool_1_snp_index']=df.apply(lambda x: get_snp_index(x.pool_1_gt,x.pool_1_ad), axis = 1)
+        df['pool_2_snp_index']=df.apply(lambda x: get_snp_index(x.pool_2_gt,x.pool_2_ad), axis = 1)
+        df = df[(df['pool_1_snp_index']>min_snpindex)|(df['pool_2_snp_index']>min_snpindex)]
+        df.dropna(inplace=True)
+        df.eval('delta_snp_index = pool_2_snp_index-pool_1_snp_index',inplace=True)
+        df['ed6'] = df.apply(lambda x:get_ed6(x.pool_1_snp_index, x.pool_2_snp_index),axis = 1)
+
+        self.df = df[['CHROM', 'POS', 'REF', 'ALT','pool_1_gt','pool_1_snp_index','pool_2_gt','pool_1_snp_index','ed6','delta_snp_index']]
 
     def slide_window(self):
         df = self.df
@@ -174,16 +230,26 @@ class fisher_page(QTabWidget):
                 df_window = df_window.append({'chrom':self.chroms[i],'window_end':window_end,'window_start':window_end-win_size},ignore_index=True)
                 window_end = window_end+win_step
         df_window.eval('window_central = (window_start+window_end)/2',inplace=True)
+        def get_slide_ed(chrom,window_start,window_end,df):
+            n_snp = self.n_snp_spinbox.value()
+            data_df = df[df['CHROM'] == chrom]
+            data_df = data_df[(data_df['POS']<window_end) & (data_df['POS']> window_start)]
+            if data_df.shape[0] > n_snp:
+                slide_ed = data_df['ed6'].mean()
+            else:
+                slide_ed =None
+            return slide_ed
         def get_slide_index(chrom,window_start,window_end,df):
             n_snp = self.n_snp_spinbox.value()
             data_df = df[df['CHROM'] == chrom]
             data_df = data_df[(data_df['POS']<window_end) & (data_df['POS']> window_start)]
             if data_df.shape[0] > n_snp:
-                slide_index = data_df['d'].mean()
+                slide_index = data_df['delta_snp_index'].mean()
             else:
                 slide_index =None
             return slide_index
-        df_window['slide_pvalue']=df_window.apply(lambda x: get_slide_index(x.chrom,x.window_start,x.window_end,df),axis = 1)
+        df_window['slide_ed6']=df_window.apply(lambda x: get_slide_ed(x.chrom,x.window_start,x.window_end,df),axis = 1)
+        df_window['slide_index']=df_window.apply(lambda x: get_slide_index(x.chrom,x.window_start,x.window_end,df),axis = 1)
         self.df_window = df_window
 
     def draw(self):
@@ -195,21 +261,37 @@ class fisher_page(QTabWidget):
         for i in range(0,self.chrom_count):
             draw_df_1 = self.df_window[self.df_window['chrom'] == self.chroms[i]]
             draw_df_2 = self.df[self.df['CHROM'] == self.chroms[i]]
-            ax = self.fig.add_subplot(2,pic_row,i+1)
+            ax = self.fig_1.add_subplot(2,pic_row,i+1)
             ax.cla()
-            ax.plot(draw_df_1['window_central']/1000000,draw_df_1['slide_pvalue'],c='red',linewidth=3)
-            ax.axhline(y=3, c="g", ls="--")
-            ax.scatter(draw_df_2['POS']/1000000,draw_df_2['d'],c='blue',alpha=0.4)
+            ax.plot(draw_df_1['window_central']/1000000,draw_df_1['slide_index'],c='red')
+            ax.scatter(draw_df_2['POS']/1000000,draw_df_2['delta_snp_index'],c='blue')
             ax.set_title(self.chroms[i])
             ax.set_xlabel('position (Mb)')
-            ax.set_ylabel('-log10(pvalue)')
+            ax.set_ylabel('delta_snp_index')
+            ax.set_ylim(-1.01, 1.01)
+        self.fig_1.subplots_adjust(wspace=0.5, hspace=0.3)
+        self.canvas_1.draw()
+        for i in range(0,self.chrom_count):
+            draw_df_1 = self.df_window[self.df_window['chrom'] == self.chroms[i]]
+            draw_df_2 = self.df[self.df['CHROM'] == self.chroms[i]]
+            ax = self.fig_2.add_subplot(2,pic_row,i+1)
+            ax.cla()
+            ax.plot(draw_df_1['window_central']/1000000,draw_df_1['slide_ed6'],c='red')
+            ax.scatter(draw_df_2['POS']/1000000,draw_df_2['ed6'],c='blue')
+            ax.set_title(self.chroms[i])
+            ax.set_xlabel('position (Mb)')
+            ax.set_ylabel('ED6')
             ax.set_ylim(0, 10.1)
-        self.fig.subplots_adjust(wspace=0.5, hspace=0.3)
-        self.canvas.draw()
-    def download_picture(self):
+        self.fig_2.subplots_adjust(wspace=0.5, hspace=0.3)
+        self.canvas_2.draw()
+    def download_picture_1(self):
         filename = QFileDialog.getSaveFileName(self,'save file','','Image files(*.jpg *.gif *.png)')
         with open(filename[0],'w') as f:
-            self.fig.savefig(filename[0],dpi=600)
+            self.fig_1.savefig(filename[0],dpi=600)
+    def download_picture_1(self):
+        filename = QFileDialog.getSaveFileName(self,'save file','','Image files(*.jpg *.gif *.png)')
+        with open(filename[0],'w') as f:
+            self.fig_2.savefig(filename[0],dpi=600)
     def download_window(self):
             filename = QFileDialog.getSaveFileName(self,'save file','','Text Files (*.txt)')
             with open(filename[0],'w') as f:
@@ -218,3 +300,7 @@ class fisher_page(QTabWidget):
             filename = QFileDialog.getSaveFileName(self,'save file','','Text Files (*.txt)')
             with open(filename[0],'w') as f:
                 self.df.to_csv(filename[0],sep='\t',index=False)
+    def download_picture_2(self):
+        filename = QFileDialog.getSaveFileName(self,'save file','','Image files(*.jpg *.gif *.png)')
+        with open(filename[0],'w') as f:
+            self.fig_2.savefig(filename[0],dpi=600)
