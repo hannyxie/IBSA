@@ -36,7 +36,7 @@ Then setting slide window paremters and click second 'NEXT' button to smooth the
 
 <img src= "https://user-images.githubusercontent.com/51356059/116029818-b78c7580-a68c-11eb-8f82-badd1f328f71.png" width=400 height=320 />.
 ### 3.plotting
-Tab to another page then click 'plotting' button.the picture will show.
+Tab to another page then click 'plotting' button,the picture will show.
 ### 4.downlod
 Click the corresponding button to download the file.
 
