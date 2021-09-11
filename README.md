@@ -23,9 +23,9 @@ We provide these method.
 |method|bulk|index|threshold|
 |--|--|--|--|
 Mutmap|1-2 parent,1 bulk|SNP-index|-
-QTL-seq|1-2 parent,2 bulk|SNP-index,delta SNP-index,ED6|p99
-Modified Mutmap|2bulk|delta SNP-index,ED6|p99
-Fisher|2 bulk|-log10(p) (Fisher's exact test)|3
+QTL-seq|1-2 parent,2 bulk|SNP-index,delta SNP-index,ED6|2σ
+Modified Mutmap|2bulk|delta SNP-index,ED6|2σ
+Fisher|2 bulk|-log10(p) (Fisher's exact test)|2 or 3
 Graded Pool-seq|0-2 parent,>1 bulk|-log10(p) (Ridit)|the highest p window
 
 ### 1.uplod file and choose method
